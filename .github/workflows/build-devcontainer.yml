@@ -1,4 +1,4 @@
-name: Build and Push DevContainer Docker Image
+name: Build DevContainer Image
 
 on:
   push:
