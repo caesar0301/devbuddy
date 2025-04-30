@@ -15,6 +15,7 @@ jobs:
     outputs:
       goappbuilder: ${{ steps.filter.outputs.goappbuilder }}
       alpine: ${{ steps.filter.outputs.alpine }}
+      ollama: ${{ steps.filter.outputs.ollama }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
