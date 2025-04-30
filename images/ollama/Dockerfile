@@ -1,7 +1,7 @@
 FROM ollama/ollama:0.6.6
 
 # Preload model during image build
-RUN pull nomic-embed-text:latest
+RUN ollama pull nomic-embed-text:latest
 
 # Optionally expose the default port
 EXPOSE 11434
