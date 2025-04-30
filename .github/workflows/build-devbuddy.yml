@@ -26,10 +26,10 @@ jobs:
           filters: |
             alpine:
               - 'images/alpine/Dockerfile'
-              - '.github/workflows/build-devbuddy.yml'
             goappbuilder:
               - 'images/goappbuilder/Dockerfile'
-              - '.github/workflows/build-devbuddy.yml'
+            ollama:
+              - 'images/ollama/Dockerfile'
 
   build-and-push:
     needs: filter-changes
@@ -50,7 +50,12 @@ jobs:
             tag: goapp-builder
             version: 1.23.8-alpine3.21
             condition: ${{ needs.filter-changes.outputs.goappbuilder }}
-
+          - name: ollama
+            path: images/ollama/Dockerfile
+            context: .
+            tag: ollama
+            version: 0.6.6-nomicembed
+            condition: ${{ needs.filter-changes.outputs.ollama }}
     steps:
       - name: Check if component has changes
         if: ${{ matrix.component.condition != 'true' }}
