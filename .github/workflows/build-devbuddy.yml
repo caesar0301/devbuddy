@@ -15,7 +15,6 @@ jobs:
     outputs:
       goappbuilder: ${{ steps.filter.outputs.goappbuilder }}
       alpine: ${{ steps.filter.outputs.alpine }}
-      ollama: ${{ steps.filter.outputs.ollama }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,8 +28,6 @@ jobs:
               - 'images/alpine/Dockerfile'
             goappbuilder:
               - 'images/goappbuilder/Dockerfile'
-            ollama:
-              - 'images/ollama/Dockerfile'
 
   build-and-push:
     needs: filter-changes
@@ -51,12 +48,6 @@ jobs:
             tag: goapp-builder
             version: 1.23.8-alpine3.21
             condition: ${{ needs.filter-changes.outputs.goappbuilder }}
-          - name: ollama
-            path: images/ollama/Dockerfile
-            context: .
-            tag: ollama
-            version: 0.6.6-nomicembed
-            condition: ${{ needs.filter-changes.outputs.ollama }}
     steps:
       - name: Check if component has changes
         if: ${{ matrix.component.condition != 'true' }}
