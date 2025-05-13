@@ -16,6 +16,7 @@ jobs:
       goappbuilder: ${{ steps.filter.outputs.goappbuilder }}
       alpine: ${{ steps.filter.outputs.alpine }}
       # olmocr: ${{ steps.filter.outputs.olmocr }}
+      kuberay: ${{ steps.filter.outputs.kuberay }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,6 +32,8 @@ jobs:
               - 'images/goappbuilder/Dockerfile'
             olmocr:
               - 'images/olmocr/Dockerfile'
+            kuberay:
+              - 'images/kuberay/Dockerfile'
 
   build-and-push:
     needs: filter-changes
@@ -60,6 +63,13 @@ jobs:
             version: 1.0.0
             platforms: linux/amd64
             condition: ${{ needs.filter-changes.outputs.olmocr }}
+          - name: kuberay
+            path: images/kuberay/Dockerfile
+            context: images/kuberay
+            tag: ray
+            version: 2.44.1-py311-numpy2x
+            platforms: linux/amd64,linux/arm64
+            condition: ${{ needs.filter-changes.outputs.kuberay }}
     steps:
       - name: Check if component has changes
         if: ${{ matrix.component.condition != 'true' }}
