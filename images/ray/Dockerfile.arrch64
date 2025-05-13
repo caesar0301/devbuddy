@@ -1,3 +1,3 @@
 FROM rayproject/ray:2.44.1-py311-aarch64
-RUN pip install -U "cupy-cuda12x~=13.4" "scipy>=1.10,<=1.14" "numpy>=2.0,<=2.1" contourpy streamlit numba pywavelets && pip cache purge
+RUN pip install -U "cupy-cuda12x~=13.4" "scipy>=1.10,<=1.14" "numpy>=2.0,<=2.1" contourpy streamlit numba pywavelets pip && pip cache purge
 ENV PYTHON_VERSION=3.11
