@@ -16,7 +16,8 @@ jobs:
       goappbuilder: ${{ steps.filter.outputs.goappbuilder }}
       alpine: ${{ steps.filter.outputs.alpine }}
       # olmocr: ${{ steps.filter.outputs.olmocr }}
-      kuberay: ${{ steps.filter.outputs.kuberay }}
+      ray: ${{ steps.filter.outputs.ray }}
+      rayaarch64: ${{ steps.filter.outputs.rayaarch64 }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,8 +33,10 @@ jobs:
               - 'images/goappbuilder/Dockerfile'
             olmocr:
               - 'images/olmocr/Dockerfile'
-            kuberay:
-              - 'images/kuberay/Dockerfile'
+            ray:
+              - 'images/ray/Dockerfile'
+            rayaarch64:
+              - 'images/ray/Dockerfile.aarch64'
 
   build-and-push:
     needs: filter-changes
@@ -63,13 +66,20 @@ jobs:
             version: 1.0.0
             platforms: linux/amd64
             condition: ${{ needs.filter-changes.outputs.olmocr }}
-          - name: kuberay
-            path: images/kuberay/Dockerfile
-            context: images/kuberay
+          - name: ray
+            path: images/ray/Dockerfile
+            context: images/ray
             tag: ray
             version: 2.44.1-py311-numpy2x
-            platforms: linux/amd64,linux/arm64
-            condition: ${{ needs.filter-changes.outputs.kuberay }}
+            platforms: linux/amd64
+            condition: ${{ needs.filter-changes.outputs.ray }}
+          - name: rayaarch64
+            path: images/ray/Dockerfile.aarch64
+            context: images/ray
+            tag: ray
+            version: 2.44.1-py311-numpy2x-aarch64
+            platforms: linux/arm64
+            condition: ${{ needs.filter-changes.outputs.rayaarch64 }}
     steps:
       - name: Check if component has changes
         if: ${{ matrix.component.condition != 'true' }}
