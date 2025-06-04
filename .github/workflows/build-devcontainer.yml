@@ -37,7 +37,6 @@ jobs:
               - 'devcontainer/Dockerfile'
               - '.github/workflows/build-devcontainer.yml'
 
-      # Build and push Docker image
       - name: Build and push devcontainer image
         if: steps.devcontainer-changes.outputs.matched
         uses: docker/build-push-action@v5
