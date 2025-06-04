@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y sudo adduser \
       cmake gdb llvm clang zsh tmux python3 python3-pip \
       openjdk-17-jdk openjdk-21-jdk nodejs npm \
       universal-ctags ripgrep silversearcher-ag \
-      iputils-ping netcat-openbsd \
+      iputils-ping netcat-openbsd bsdmainutils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a new user named 'admin' and add it to the sudo group
