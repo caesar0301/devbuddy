@@ -28,16 +28,7 @@ jobs:
           username: ${{ secrets.ALIYUNCS_USERNAME }}
           password: ${{ secrets.ALIYUNCS_TOKEN }}
 
-      - name: Check devcontainer changes
-        uses: dorny/paths-filter@v3
-        id: devcontainer-changes
-        with:
-          filters: |
-            devcontainer:
-              - 'devcontainer/Dockerfile'
-
       - name: Build and push devcontainer image
-        if: steps.devcontainer-changes.outputs.matched
         uses: docker/build-push-action@v5
         with:
           context: .
