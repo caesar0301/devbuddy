@@ -35,6 +35,7 @@ jobs:
           filters: |
             devcontainer:
               - 'devcontainer/Dockerfile'
+              - '.github/workflows/build-devcontainer.yml'
 
       # Build and push Docker image
       - name: Build and push devcontainer image
