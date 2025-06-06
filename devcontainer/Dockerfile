@@ -26,8 +26,12 @@ RUN /usr/bin/zsh && \
     export PYENV_ROOT="$HOME/.pyenv" && \
     [ -d $PYENV_ROOT/bin ] && \
     export PATH="$PYENV_ROOT/bin:$PATH" && \
-    eval "$(pyenv init - bash)" && \
-    pyenv install 3.7.10
+    pyenv install 3.7.15 && \
+    pyenv install 3.8.20 && \
+    pyenv install 3.9.20 && \
+    pyenv install 3.10.15 && \
+    pyenv install 3.11.10 && \
+    pyenv install 3.12.9
 
 # Set the default command to start a bash shell
 CMD ["/usr/bin/zsh"]
