@@ -17,6 +17,8 @@ WORKDIR /home/admin
 RUN git clone --depth=1 --branch for_devc https://github.com/caesar0301/dotfiles.git ~/.dotfiles
 RUN cd ~/.dotfiles && ./zsh/install.sh
 RUN cd ~/.dotfiles && SUDO_PASS="${SUDO_PASS}" ~/.dotfiles/nvim/install.sh
+RUN zsh
+RUN nvim --headless +PackerInstall +qa
 
 # Set the default command to start a bash shell
 CMD ["/usr/bin/zsh"]
