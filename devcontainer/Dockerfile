@@ -16,6 +16,7 @@ WORKDIR /home/admin
 # Install dotfiles
 RUN git clone --depth=1 --branch for_devc https://github.com/caesar0301/dotfiles.git ~/.dotfiles
 RUN cd ~/.dotfiles && ./zsh/install.sh
+RUN /usr/bin/zsh && zshld
 RUN cd ~/.dotfiles && SUDO_PASS="${SUDO_PASS}" ~/.dotfiles/nvim/install.sh
 RUN /home/admin/.local/bin/nvim --headless -u ~/.dotfiles/nvim/minimal_init.lua +PackerInstall +qa
 
