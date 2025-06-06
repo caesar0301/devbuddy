@@ -16,12 +16,10 @@ WORKDIR /home/admin
 # Install dotfiles
 RUN git clone --depth=1 --branch for_devc https://github.com/caesar0301/dotfiles.git ~/.dotfiles
 
-# Install nvim configs
 RUN mkdir -p ~/.config
+RUN cd ~/.dotfiles && ./zsh/install.sh
 RUN cd ~/.dotfiles && SUDO_PASS="${SUDO_PASS}" ~/.dotfiles/nvim/install.sh
 
-# Install zsh configs
-RUN cd ~/.dotfiles && ./zsh/install.sh
 RUN /usr/bin/zsh && \
     export PYENV_ROOT="$HOME/.pyenv" && \
     [ -d $PYENV_ROOT/bin ] && \
