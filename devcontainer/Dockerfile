@@ -19,13 +19,12 @@ RUN git clone --depth=1 --branch for_devc https://github.com/caesar0301/dotfiles
 # Install nvim configs
 RUN mkdir -p ~/.config
 RUN cd ~/.dotfiles && SUDO_PASS="${SUDO_PASS}" ~/.dotfiles/nvim/install.sh
-RUN ~/.local/bin/nvim --headless -u ~/.dotfiles/nvim/minimal_init.lua +PackerInstall +qa
 
 # Install zsh configs
 RUN cd ~/.dotfiles && ./zsh/install.sh
 RUN /usr/bin/zsh && \
     export PYENV_ROOT="$HOME/.pyenv" && \
-    [[ -d $PYENV_ROOT/bin ]] && \
+    [ -d $PYENV_ROOT/bin ] && \
     export PATH="$PYENV_ROOT/bin:$PATH" && \
     eval "$(pyenv init - bash)" && \
     pyenv install 3.7.10
