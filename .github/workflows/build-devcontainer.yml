@@ -81,8 +81,8 @@ jobs:
           file: ${{ matrix.component.path }}
           push: true
           platforms: ${{ matrix.component.platforms }}
-          #cache-from: type=gha,scope=${{ matrix.component.name }}
-          #cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}
-          no-cache: true
+          cache-from: type=gha,scope=${{ matrix.component.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}
+          #no-cache: true
           tags: |
             registry.cn-hangzhou.aliyuncs.com/lacogito/${{ matrix.component.tag }}:${{ matrix.component.version }}

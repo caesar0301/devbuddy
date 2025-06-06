@@ -15,10 +15,19 @@ WORKDIR /home/admin
 
 # Install dotfiles
 RUN git clone --depth=1 --branch for_devc https://github.com/caesar0301/dotfiles.git ~/.dotfiles
-RUN cd ~/.dotfiles && ./zsh/install.sh
-RUN /usr/bin/zsh && zshld
+
+# Install nvim configs
 RUN cd ~/.dotfiles && SUDO_PASS="${SUDO_PASS}" ~/.dotfiles/nvim/install.sh
-RUN /home/admin/.local/bin/nvim --headless -u ~/.dotfiles/nvim/minimal_init.lua +PackerInstall +qa
+RUN ~/.local/bin/nvim --headless -u ~/.dotfiles/nvim/minimal_init.lua +PackerInstall +qa
+
+# Install zsh configs
+RUN cd ~/.dotfiles && ./zsh/install.sh
+RUN /usr/bin/zsh && \
+    export PYENV_ROOT="$HOME/.pyenv" && \
+    [[ -d $PYENV_ROOT/bin ]] && \
+    export PATH="$PYENV_ROOT/bin:$PATH" && \
+    eval "$(pyenv init - bash)" && \
+    pyenv install 3.7.10
 
 # Set the default command to start a bash shell
 CMD ["/usr/bin/zsh"]
