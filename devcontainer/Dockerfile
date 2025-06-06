@@ -17,6 +17,7 @@ WORKDIR /home/admin
 RUN git clone --depth=1 --branch for_devc https://github.com/caesar0301/dotfiles.git ~/.dotfiles
 
 # Install nvim configs
+RUN mkdir -p ~/.config
 RUN cd ~/.dotfiles && SUDO_PASS="${SUDO_PASS}" ~/.dotfiles/nvim/install.sh
 RUN ~/.local/bin/nvim --headless -u ~/.dotfiles/nvim/minimal_init.lua +PackerInstall +qa
 
