@@ -37,6 +37,10 @@ jobs:
               - 'images/ray/Dockerfile'
             rayaarch64:
               - 'images/ray/Dockerfile.aarch64'
+            node:
+              - 'images/node/Dockerfile'
+            nginx:
+              - 'images/nginx/Dockerfile'
 
   build-and-push:
     needs: filter-changes
@@ -80,6 +84,18 @@ jobs:
             version: 2.44.1-py311-numpy2x-aarch64
             platforms: linux/arm64
             condition: ${{ needs.filter-changes.outputs.rayaarch64 }}
+          - name: node
+            path: images/node/Dockerfile
+            context: images/node
+            tag: node
+            version: 24-alpine3.21
+            platforms: linux/amd64,linux/arm64
+            condition: ${{ needs.filter-changes.outputs.node }}
+          - name: nginx
+            path: images/nginx/Dockerfile
+            context: images/nginx
+            tag: nginx
+            version: alpine
     steps:
       - name: Check if component has changes
         if: ${{ matrix.component.condition != 'true' }}
