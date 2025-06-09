@@ -18,6 +18,8 @@ jobs:
       # olmocr: ${{ steps.filter.outputs.olmocr }}
       ray: ${{ steps.filter.outputs.ray }}
       rayaarch64: ${{ steps.filter.outputs.rayaarch64 }}
+      node: ${{ steps.filter.outputs.node }}
+      nginx: ${{ steps.filter.outputs.nginx }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -96,6 +98,8 @@ jobs:
             context: images/nginx
             tag: nginx
             version: alpine
+            platforms: linux/amd64,linux/arm64
+            condition: ${{ needs.filter-changes.outputs.nginx }}
     steps:
       - name: Check if component has changes
         if: ${{ matrix.component.condition != 'true' }}
