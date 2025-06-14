@@ -133,14 +133,15 @@ jobs:
         id: get-config
         run: |
           CONFIG=$(cat images/image-config.yaml | yq e -o=json -)
-          # Escape the JSON string for GitHub Actions output
-          CONFIG_ESCAPED=$(echo "$CONFIG" | jq -c '.' | sed 's/"/\\"/g')
-          echo "config=$CONFIG_ESCAPED" >> $GITHUB_OUTPUT
+          echo "config<<EOF" >> $GITHUB_OUTPUT
+          echo "$CONFIG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create Dockerfile
         run: |
+          IMAGE_NAME="${{ matrix.component.name }}"
           DOCKERFILE_PATH="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}/Dockerfile"
-          DOCKERFILE_CONTENT="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].dockerfile }}"
+          DOCKERFILE_CONTENT=$(yq e ".images.$IMAGE_NAME.dockerfile" images/image-config.yaml)
           echo "$DOCKERFILE_CONTENT" > "$DOCKERFILE_PATH"
           
           # Verify Dockerfile was created
