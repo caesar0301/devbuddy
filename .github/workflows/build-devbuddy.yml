@@ -49,12 +49,6 @@ jobs:
             done
           done
 
-          # Validate registry config
-          if ! yq e '.registry.url' images/image-config.yaml > /dev/null || ! yq e '.registry.namespace' images/image-config.yaml > /dev/null; then
-            echo "Error: Missing required registry configuration"
-            exit 1
-          fi
-
   filter-changes:
     needs: validate-config
     runs-on: ubuntu-latest
@@ -131,7 +125,7 @@ jobs:
       - name: Log in to Aliyuncs Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ fromJSON(steps.get-config.outputs.config).registry.url }}
+          registry: registry.cn-hangzhou.aliyuncs.com
           username: ${{ secrets.ALIYUNCS_USERNAME }}
           password: ${{ secrets.ALIYUNCS_TOKEN }}
 
@@ -162,4 +156,4 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.component.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}
           tags: |
-            ${{ fromJSON(steps.get-config.outputs.config).registry.url }}/${{ fromJSON(steps.get-config.outputs.config).registry.namespace }}/${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].tag }}:${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].version }}
+            registry.cn-hangzhou.aliyuncs.com/lacogito/${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].tag }}:${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].version }}
