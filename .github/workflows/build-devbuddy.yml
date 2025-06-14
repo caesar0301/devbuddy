@@ -141,6 +141,8 @@ jobs:
         run: |
           IMAGE_NAME="${{ matrix.component.name }}"
           DOCKERFILE_PATH="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}/Dockerfile"
+          # Create directory if it doesn't exist
+          mkdir -p "$(dirname "$DOCKERFILE_PATH")"
           DOCKERFILE_CONTENT=$(yq e ".images.$IMAGE_NAME.dockerfile" images/image-config.yaml)
           echo "$DOCKERFILE_CONTENT" > "$DOCKERFILE_PATH"
           
