@@ -7,6 +7,13 @@ on:
     paths:
       - 'images/**'
       - '.github/workflows/build-devbuddy.yml'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild all images'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -86,22 +93,31 @@ jobs:
           MATRIX="["
           HAS_CHANGES="false"
           
-          # Check if config file changed
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/image-config.yaml"; then
-            echo "Config file changed, marking all images as changed"
+          # Check if this is a manual trigger with force rebuild
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+            echo "Force rebuild requested, marking all images for rebuild"
             for img in $IMAGES; do
               MATRIX="$MATRIX{\"name\":\"$img\"},"
             done
             HAS_CHANGES="true"
           else
-            # Check individual image directories
-            for img in $IMAGES; do
-              if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/$img/"; then
-                echo "Changes detected in $img"
+            # Check if config file changed
+            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/image-config.yaml"; then
+              echo "Config file changed, marking all images as changed"
+              for img in $IMAGES; do
                 MATRIX="$MATRIX{\"name\":\"$img\"},"
-                HAS_CHANGES="true"
-              fi
-            done
+              done
+              HAS_CHANGES="true"
+            else
+              # Check individual image directories
+              for img in $IMAGES; do
+                if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/$img/"; then
+                  echo "Changes detected in $img"
+                  MATRIX="$MATRIX{\"name\":\"$img\"},"
+                  HAS_CHANGES="true"
+                fi
+              done
+            fi
           fi
           
           # Only add matrix if there are changes
