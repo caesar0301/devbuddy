@@ -74,20 +74,14 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for change detection
 
-      - name: Debug git history
-        run: |
-          echo "Current commit: ${{ github.sha }}"
-          echo "Previous commit: ${{ github.event.before }}"
-          git log -1
-          echo "Changed files:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-
       - name: Set matrix output
         id: set-matrix
         run: |
           # Read image config
           IMAGES=$(cat images/image-config.yaml | yq e '.images | keys | .[]' -)
-          echo "Available images: $IMAGES"
+          echo "::group::Available Images"
+          echo "$IMAGES"
+          echo "::endgroup::"
           
           # Create matrix for changed images
           MATRIX="["
@@ -95,7 +89,7 @@ jobs:
           
           # Check if this is a manual trigger with force rebuild
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
-            echo "Force rebuild requested, marking all images for rebuild"
+            echo "::notice::Force rebuild requested, marking all images for rebuild"
             for img in $IMAGES; do
               MATRIX="$MATRIX{\"name\":\"$img\"},"
             done
@@ -103,7 +97,7 @@ jobs:
           else
             # Check if config file changed
             if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/image-config.yaml"; then
-              echo "Config file changed, marking all images as changed"
+              echo "::notice::Config file changed, marking all images as changed"
               for img in $IMAGES; do
                 MATRIX="$MATRIX{\"name\":\"$img\"},"
               done
@@ -112,7 +106,7 @@ jobs:
               # Check individual image directories
               for img in $IMAGES; do
                 if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/$img/"; then
-                  echo "Changes detected in $img"
+                  echo "::notice::Changes detected in $img"
                   MATRIX="$MATRIX{\"name\":\"$img\"},"
                   HAS_CHANGES="true"
                 fi
@@ -129,8 +123,11 @@ jobs:
           fi
           
           echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
+          
+          echo "::group::Matrix Output"
           echo "Matrix: $MATRIX"
           echo "Has changes: $HAS_CHANGES"
+          echo "::endgroup::"
 
   build-and-push:
     needs: filter-changes
@@ -167,7 +164,7 @@ jobs:
           
           # Verify Dockerfile was created
           if [ ! -f "$DOCKERFILE_PATH" ]; then
-            echo "Error: Failed to create Dockerfile at $DOCKERFILE_PATH"
+            echo "::error::Failed to create Dockerfile at $DOCKERFILE_PATH"
             exit 1
           fi
 
