@@ -1,0 +1,58 @@
+images:
+  alpine:
+    base: alpine:3.21
+    platforms: [linux/amd64, linux/arm64]
+    context: images/alpine
+    tag: alpine
+    version: 3.21
+    dockerfile: |
+      FROM alpine:3.21
+
+  goappbuilder:
+    base: golang:1.23.8-alpine3.21
+    platforms: [linux/amd64, linux/arm64]
+    context: images/goappbuilder
+    tag: goapp-builder
+    version: 1.23.8-alpine3.21
+    dockerfile: |
+      FROM golang:1.23.8-alpine3.21
+
+  ray:
+    base: rayproject/ray:2.44.1-py311-numpy2x
+    platforms: [linux/amd64]
+    context: images/ray
+    tag: ray
+    version: 2.44.1-py311-numpy2x
+    dockerfile: |
+      FROM rayproject/ray:2.44.1-py311-numpy2x
+
+  rayaarch64:
+    base: rayproject/ray:2.44.1-py311-numpy2x
+    platforms: [linux/arm64]
+    context: images/ray
+    tag: ray
+    version: 2.44.1-py311-numpy2x-aarch64
+    dockerfile: |
+      FROM rayproject/ray:2.44.1-py311-numpy2x
+
+  node:
+    base: node:24-alpine3.21
+    platforms: [linux/amd64, linux/arm64]
+    context: images/node
+    tag: node
+    version: 24-alpine3.21
+    dockerfile: |
+      FROM node:24-alpine3.21
+
+  nginx:
+    base: nginx:alpine
+    platforms: [linux/amd64, linux/arm64]
+    context: images/nginx
+    tag: nginx
+    version: alpine
+    dockerfile: |
+      FROM nginx:alpine
+
+registry:
+  url: registry.cn-hangzhou.aliyuncs.com
+  namespace: lacogito 

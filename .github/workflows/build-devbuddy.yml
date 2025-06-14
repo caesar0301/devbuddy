@@ -4,134 +4,136 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'images/**'
+      - '.github/workflows/build-devbuddy.yml'
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  filter-changes:
+  validate-config:
     runs-on: ubuntu-latest
-    outputs:
-      goappbuilder: ${{ steps.filter.outputs.goappbuilder }}
-      alpine: ${{ steps.filter.outputs.alpine }}
-      # olmocr: ${{ steps.filter.outputs.olmocr }}
-      ray: ${{ steps.filter.outputs.ray }}
-      rayaarch64: ${{ steps.filter.outputs.rayaarch64 }}
-      node: ${{ steps.filter.outputs.node }}
-      nginx: ${{ steps.filter.outputs.nginx }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Filter changed paths
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            alpine:
-              - 'images/alpine/Dockerfile'
-            goappbuilder:
-              - 'images/goappbuilder/Dockerfile'
-            olmocr:
-              - 'images/olmocr/Dockerfile'
-            ray:
-              - 'images/ray/Dockerfile'
-            rayaarch64:
-              - 'images/ray/Dockerfile.aarch64'
-            node:
-              - 'images/node/Dockerfile'
-            nginx:
-              - 'images/nginx/Dockerfile'
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+
+      - name: Validate image config
+        run: |
+          # Check if config file exists
+          if [ ! -f images/image-config.yaml ]; then
+            echo "Error: image-config.yaml not found"
+            exit 1
+          fi
+
+          # Validate YAML syntax
+          if ! yq e '.' images/image-config.yaml > /dev/null; then
+            echo "Error: Invalid YAML syntax in image-config.yaml"
+            exit 1
+          fi
+
+          # Validate required fields
+          for img in $(yq e '.images | keys | .[]' images/image-config.yaml); do
+            required_fields=("base" "platforms" "context" "tag" "version" "dockerfile")
+            for field in "${required_fields[@]}"; do
+              if ! yq e ".images.$img.$field" images/image-config.yaml > /dev/null; then
+                echo "Error: Missing required field '$field' for image '$img'"
+                exit 1
+              fi
+            done
+          done
+
+          # Validate registry config
+          if ! yq e '.registry.url' images/image-config.yaml > /dev/null || ! yq e '.registry.namespace' images/image-config.yaml > /dev/null; then
+            echo "Error: Missing required registry configuration"
+            exit 1
+          fi
+
+  filter-changes:
+    needs: validate-config
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set matrix output
+        id: set-matrix
+        run: |
+          # Read image config
+          IMAGES=$(cat images/image-config.yaml | yq e '.images | keys | .[]' -)
+          
+          # Create matrix for changed images
+          MATRIX="["
+          for img in $IMAGES; do
+            # Check for changes in image directory or config file
+            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q -E "images/$img/|images/image-config.yaml"; then
+              MATRIX="$MATRIX{\"name\":\"$img\"},"
+            fi
+          done
+          MATRIX="${MATRIX%,}]"
+          
+          if [ "$MATRIX" = "[]" ]; then
+            echo "No changes detected in any images"
+            exit 0
+          fi
+          
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
   build-and-push:
     needs: filter-changes
+    if: needs.filter-changes.outputs.matrix != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        component:
-          - name: alpine
-            path: images/alpine/Dockerfile
-            context: images/alpine
-            tag: alpine
-            version: 3.21
-            platforms: linux/amd64,linux/arm64
-            condition: ${{ needs.filter-changes.outputs.alpine }}
-          - name: goappbuilder
-            path: images/goappbuilder/Dockerfile
-            context: images/goappbuilder
-            tag: goapp-builder
-            version: 1.23.8-alpine3.21
-            platforms: linux/amd64,linux/arm64
-            condition: ${{ needs.filter-changes.outputs.goappbuilder }}
-          - name: olmocr
-            path: images/olmocr/Dockerfile
-            context: images/olmocr
-            tag: olmocr
-            version: 1.0.0
-            platforms: linux/amd64
-            condition: ${{ needs.filter-changes.outputs.olmocr }}
-          - name: ray
-            path: images/ray/Dockerfile
-            context: images/ray
-            tag: ray
-            version: 2.44.1-py311-numpy2x
-            platforms: linux/amd64
-            condition: ${{ needs.filter-changes.outputs.ray }}
-          - name: rayaarch64
-            path: images/ray/Dockerfile.aarch64
-            context: images/ray
-            tag: ray
-            version: 2.44.1-py311-numpy2x-aarch64
-            platforms: linux/arm64
-            condition: ${{ needs.filter-changes.outputs.rayaarch64 }}
-          - name: node
-            path: images/node/Dockerfile
-            context: images/node
-            tag: node
-            version: 24-alpine3.21
-            platforms: linux/amd64,linux/arm64
-            condition: ${{ needs.filter-changes.outputs.node }}
-          - name: nginx
-            path: images/nginx/Dockerfile
-            context: images/nginx
-            tag: nginx
-            version: alpine
-            platforms: linux/amd64,linux/arm64
-            condition: ${{ needs.filter-changes.outputs.nginx }}
+        component: ${{ fromJson(needs.filter-changes.outputs.matrix) }}
     steps:
-      - name: Check if component has changes
-        if: ${{ matrix.component.condition != 'true' }}
-        run: |
-          echo "No changes detected for ${{ matrix.component.name }}. Skipping build."
-          exit 0
-
       - name: Checkout code
-        if: ${{ matrix.component.condition == 'true' }}
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        if: ${{ matrix.component.condition == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Aliyuncs Registry
-        if: ${{ matrix.component.condition == 'true' }}
         uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: ${{ fromJSON(steps.get-config.outputs.config).registry.url }}
           username: ${{ secrets.ALIYUNCS_USERNAME }}
           password: ${{ secrets.ALIYUNCS_TOKEN }}
 
+      - name: Get image config
+        id: get-config
+        run: |
+          CONFIG=$(cat images/image-config.yaml | yq e -o=json -)
+          echo "config=$CONFIG" >> $GITHUB_OUTPUT
+
+      - name: Create Dockerfile
+        run: |
+          DOCKERFILE_PATH="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}/Dockerfile"
+          echo "${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].dockerfile }}" > "$DOCKERFILE_PATH"
+          
+          # Verify Dockerfile was created
+          if [ ! -f "$DOCKERFILE_PATH" ]; then
+            echo "Error: Failed to create Dockerfile at $DOCKERFILE_PATH"
+            exit 1
+          fi
+
       - name: Build and push ${{ matrix.component.name }} image
-        if: ${{ matrix.component.condition == 'true' }}
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.component.context }}
-          file: ${{ matrix.component.path }}
+          context: ${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}
+          file: ${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}/Dockerfile
           push: true
-          platforms: ${{ matrix.component.platforms }}
+          platforms: ${{ join(fromJSON(steps.get-config.outputs.config).images[matrix.component.name].platforms, ',') }}
           cache-from: type=gha,scope=${{ matrix.component.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}
           tags: |
-            registry.cn-hangzhou.aliyuncs.com/lacogito/${{ matrix.component.tag }}:${{ matrix.component.version }}
+            ${{ fromJSON(steps.get-config.outputs.config).registry.url }}/${{ fromJSON(steps.get-config.outputs.config).registry.namespace }}/${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].tag }}:${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].version }}
