@@ -60,6 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -72,24 +73,29 @@ jobs:
           
           # Create matrix for changed images
           MATRIX="["
+          HAS_CHANGES="false"
+          
           for img in $IMAGES; do
             # Check for changes in image directory or config file
             if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q -E "images/$img/|images/image-config.yaml"; then
               MATRIX="$MATRIX{\"name\":\"$img\"},"
+              HAS_CHANGES="true"
             fi
           done
-          MATRIX="${MATRIX%,}]"
           
-          if [ "$MATRIX" = "[]" ]; then
-            echo "No changes detected in any images"
-            exit 0
+          # Only add matrix if there are changes
+          if [ "$HAS_CHANGES" = "true" ]; then
+            MATRIX="${MATRIX%,}]"
+            echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          else
+            echo "matrix=[]" >> $GITHUB_OUTPUT
           fi
           
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
 
   build-and-push:
     needs: filter-changes
-    if: needs.filter-changes.outputs.matrix != '[]'
+    if: needs.filter-changes.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
