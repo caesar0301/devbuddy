@@ -133,7 +133,9 @@ jobs:
         id: get-config
         run: |
           CONFIG=$(cat images/image-config.yaml | yq e -o=json -)
-          echo "config=$CONFIG" >> $GITHUB_OUTPUT
+          # Escape the JSON string for GitHub Actions output
+          CONFIG_ESCAPED=$(echo "$CONFIG" | jq -c '.' | sed 's/"/\\"/g')
+          echo "config=$CONFIG_ESCAPED" >> $GITHUB_OUTPUT
 
       - name: Create Dockerfile
         run: |
