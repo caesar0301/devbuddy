@@ -64,24 +64,45 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for change detection
+
+      - name: Debug git history
+        run: |
+          echo "Current commit: ${{ github.sha }}"
+          echo "Previous commit: ${{ github.event.before }}"
+          git log -1
+          echo "Changed files:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
 
       - name: Set matrix output
         id: set-matrix
         run: |
           # Read image config
           IMAGES=$(cat images/image-config.yaml | yq e '.images | keys | .[]' -)
+          echo "Available images: $IMAGES"
           
           # Create matrix for changed images
           MATRIX="["
           HAS_CHANGES="false"
           
-          for img in $IMAGES; do
-            # Check for changes in image directory or config file
-            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q -E "images/$img/|images/image-config.yaml"; then
+          # Check if config file changed
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/image-config.yaml"; then
+            echo "Config file changed, marking all images as changed"
+            for img in $IMAGES; do
               MATRIX="$MATRIX{\"name\":\"$img\"},"
-              HAS_CHANGES="true"
-            fi
-          done
+            done
+            HAS_CHANGES="true"
+          else
+            # Check individual image directories
+            for img in $IMAGES; do
+              if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "images/$img/"; then
+                echo "Changes detected in $img"
+                MATRIX="$MATRIX{\"name\":\"$img\"},"
+                HAS_CHANGES="true"
+              fi
+            done
+          fi
           
           # Only add matrix if there are changes
           if [ "$HAS_CHANGES" = "true" ]; then
@@ -92,6 +113,8 @@ jobs:
           fi
           
           echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
+          echo "Matrix: $MATRIX"
+          echo "Has changes: $HAS_CHANGES"
 
   build-and-push:
     needs: filter-changes
