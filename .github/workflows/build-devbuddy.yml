@@ -140,7 +140,8 @@ jobs:
       - name: Create Dockerfile
         run: |
           DOCKERFILE_PATH="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}/Dockerfile"
-          echo "${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].dockerfile }}" > "$DOCKERFILE_PATH"
+          DOCKERFILE_CONTENT="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].dockerfile }}"
+          echo "$DOCKERFILE_CONTENT" > "$DOCKERFILE_PATH"
           
           # Verify Dockerfile was created
           if [ ! -f "$DOCKERFILE_PATH" ]; then
