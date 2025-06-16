@@ -1,6 +1,5 @@
 images:
   alpine:
-    base: alpine:3.21
     platforms: [linux/amd64, linux/arm64]
     context: images/alpine
     tag: alpine
@@ -9,7 +8,6 @@ images:
       FROM alpine:3.21
 
   goappbuilder:
-    base: golang:1.23.8-alpine3.21
     platforms: [linux/amd64, linux/arm64]
     context: images/goappbuilder
     tag: goapp-builder
@@ -17,7 +15,6 @@ images:
     dockerfile: images/goappbuilder/Dockerfile
 
   olmocr:
-    base: nvidia/cuda:12.4.0-runtime-ubuntu22.04
     platforms: [linux/amd64, linux/arm64]
     context: images/olmocr
     tag: olmocr
@@ -25,7 +22,6 @@ images:
     dockerfile: images/olmocr/Dockerfile
 
   ray:
-    base: rayproject/ray:2.44.1-py311
     platforms: [linux/amd64]
     context: images/ray
     tag: ray
@@ -33,7 +29,6 @@ images:
     dockerfile: images/ray/Dockerfile
 
   rayaarch64:
-    base: rayproject/ray:2.44.1-py311-aarch64
     platforms: [linux/arm64]
     context: images/ray
     tag: ray
@@ -41,7 +36,6 @@ images:
     dockerfile: images/ray/Dockerfile.aarch64
 
   node:
-    base: node:24-alpine3.21
     platforms: [linux/amd64, linux/arm64]
     context: images/node
     tag: node
@@ -50,7 +44,6 @@ images:
       FROM node:24-alpine3.21
 
   nginx:
-    base: nginx:1.27-alpine3.21
     platforms: [linux/amd64, linux/arm64]
     context: images/nginx
     tag: nginx
@@ -59,7 +52,6 @@ images:
       FROM nginx:1.27-alpine3.21
 
   redis:
-    base: docker.io/redis:8-alpine3.21
     platforms: [linux/amd64, linux/arm64]
     context: images/redis
     tag: redis
@@ -68,7 +60,6 @@ images:
       FROM docker.io/redis:8-alpine3.21
 
   postgres:
-    base: docker.io/postgres:17.5-alpine3.21 
     platforms: [linux/amd64, linux/arm64]
     context: images/postgres
     tag: postgres
@@ -77,10 +68,17 @@ images:
       FROM docker.io/postgres:17.5-alpine3.21
 
   minio:
-    base: minio/minio:RELEASE.2025-05-24T17-08-30Z
     platforms: [linux/amd64, linux/arm64]
     context: images/minio
     tag: minio
     version: RELEASE.2025-05-24T17-08-30Z
     dockerfile: |
       FROM minio/minio:RELEASE.2025-05-24T17-08-30Z
+
+  miniomc:
+    platforms: [linux/amd64, linux/arm64]
+    context: images/miniomc
+    tag: minio-mc
+    version: latest
+    dockerfile: |
+      FROM minio/mc:latest

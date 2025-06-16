@@ -40,7 +40,7 @@ jobs:
 
           # Validate required fields
           for img in $(yq e '.images | keys | .[]' images/image-config.yaml); do
-            required_fields=("base" "platforms" "context" "tag" "version" "dockerfile")
+            required_fields=("platforms" "context" "tag" "version" "dockerfile")
             for field in "${required_fields[@]}"; do
               if ! yq e ".images.$img.$field" images/image-config.yaml > /dev/null; then
                 echo "Error: Missing required field '$field' for image '$img'"
