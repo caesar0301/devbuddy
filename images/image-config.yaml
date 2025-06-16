@@ -28,12 +28,12 @@ images:
     version: 2.44.1-py311-numpy2x
     dockerfile: images/ray/Dockerfile
 
-  rayaarch64:
+  rayarm64:
     platforms: [linux/arm64]
-    context: images/ray
+    context: images/rayarm64
     tag: ray
     version: 2.44.1-py311-numpy2x-aarch64
-    dockerfile: images/ray/Dockerfile.aarch64
+    dockerfile: images/rayarm64/Dockerfile
 
   node:
     platforms: [linux/amd64, linux/arm64]
