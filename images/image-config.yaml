@@ -14,26 +14,31 @@ images:
     context: images/goappbuilder
     tag: goapp-builder
     version: 1.23.8-alpine3.21
-    dockerfile: |
-      FROM golang:1.23.8-alpine3.21
+    dockerfile: images/goappbuilder/Dockerfile
+
+  olmocr:
+    base: nvidia/cuda:12.4.0-runtime-ubuntu22.04
+    platforms: [linux/amd64, linux/arm64]
+    context: images/olmocr
+    tag: olmocr
+    version: cuda124-ubuntu2204
+    dockerfile: images/olmocr/Dockerfile
 
   ray:
-    base: rayproject/ray:2.44.1-py311-numpy2x
+    base: rayproject/ray:2.44.1-py311
     platforms: [linux/amd64]
     context: images/ray
     tag: ray
     version: 2.44.1-py311-numpy2x
-    dockerfile: |
-      FROM rayproject/ray:2.44.1-py311-numpy2x
+    dockerfile: images/ray/Dockerfile
 
   rayaarch64:
-    base: rayproject/ray:2.44.1-py311-numpy2x
+    base: rayproject/ray:2.44.1-py311-aarch64
     platforms: [linux/arm64]
     context: images/ray
     tag: ray
     version: 2.44.1-py311-numpy2x-aarch64
-    dockerfile: |
-      FROM rayproject/ray:2.44.1-py311-numpy2x
+    dockerfile: images/ray/Dockerfile.aarch64
 
   node:
     base: node:24-alpine3.21
@@ -79,12 +84,3 @@ images:
     version: RELEASE.2025-05-24T17-08-30Z
     dockerfile: |
       FROM minio/minio:RELEASE.2025-05-24T17-08-30Z
-
-  nginx:
-    base: docker.io/nginx:1.27-alpine3.21
-    platforms: [linux/amd64, linux/arm64]
-    context: images/nginx
-    tag: nginx
-    version: 1.27-alpine3.21
-    dockerfile: |
-      FROM docker.io/nginx:1.27-alpine3.21

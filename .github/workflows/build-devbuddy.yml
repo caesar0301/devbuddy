@@ -140,14 +140,25 @@ jobs:
       - name: Create Dockerfile
         run: |
           IMAGE_NAME="${{ matrix.component.name }}"
-          DOCKERFILE_PATH="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}/Dockerfile"
-          mkdir -p "$(dirname "$DOCKERFILE_PATH")"
-          DOCKERFILE_CONTENT=$(yq e ".images.$IMAGE_NAME.dockerfile" images/image-config.yaml)
-          echo "$DOCKERFILE_CONTENT" > "$DOCKERFILE_PATH"
+          CONTEXT_PATH="${{ fromJSON(steps.get-config.outputs.config).images[matrix.component.name].context }}"
+          DOCKERFILE_SPEC=$(yq e ".images.$IMAGE_NAME.dockerfile" images/image-config.yaml)
           
-          # Verify Dockerfile was created
+          # Check if dockerfile is a path or content
+          if [[ "$DOCKERFILE_SPEC" == images/* ]]; then
+            # It's a path, use it directly
+            DOCKERFILE_PATH="$DOCKERFILE_SPEC"
+            echo "Using existing Dockerfile at $DOCKERFILE_PATH"
+          else
+            # It's content, write to temp file
+            DOCKERFILE_PATH="$CONTEXT_PATH/Dockerfile"
+            mkdir -p "$(dirname "$DOCKERFILE_PATH")"
+            echo "$DOCKERFILE_SPEC" > "$DOCKERFILE_PATH"
+            echo "Created Dockerfile at $DOCKERFILE_PATH"
+          fi
+          
+          # Verify Dockerfile exists
           if [ ! -f "$DOCKERFILE_PATH" ]; then
-            echo "::error::Failed to create Dockerfile at $DOCKERFILE_PATH"
+            echo "::error::Dockerfile not found at $DOCKERFILE_PATH"
             exit 1
           fi
 
