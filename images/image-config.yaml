@@ -7,6 +7,14 @@ images:
     dockerfile: |
       FROM alpine:3.21
 
+  ubuntu:
+    platforms: [linux/amd64, linux/arm64]
+    context: images/ubuntu
+    tag: ubuntu
+    version: 24.04
+    dockerfile: |
+      FROM ubuntu:24.04
+
   goappbuilder:
     platforms: [linux/amd64, linux/arm64]
     context: images/goappbuilder
