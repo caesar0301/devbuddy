@@ -25,9 +25,9 @@ jobs:
         with:
           filters: |
             devcbase:
-              - 'devcontainer/Dockerfile-base'
+              - 'devcontainer/base/Dockerfile'
             devc:
-              - 'devcontainer/Dockerfile'
+              - 'devcontainer/pydev/Dockerfile'
 
   build-and-push:
     needs: filter-changes
@@ -37,15 +37,15 @@ jobs:
       matrix:
         component:
           - name: devcbase
-            path: devcontainer/Dockerfile-base
-            context: devcontainer
+            path: devcontainer/base/Dockerfile
+            context: devcontainer/base
             tag: devcontainer
             version: ubuntu2404-base
             platforms: linux/amd64,linux/arm64
             condition: ${{ needs.filter-changes.outputs.devcbase }}
           - name: devc
-            path: devcontainer/Dockerfile
-            context: devcontainer
+            path: devcontainer/pydev/Dockerfile
+            context: devcontainer/pydev
             tag: devcontainer
             version: ubuntu2404
             platforms: linux/amd64,linux/arm64
