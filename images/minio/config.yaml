@@ -1,0 +1,6 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/minio
+tag: minio
+version: RELEASE.2025-05-24T17-08-30Z
+dockerfile: |
+  FROM minio/minio:RELEASE.2025-05-24T17-08-30Z 

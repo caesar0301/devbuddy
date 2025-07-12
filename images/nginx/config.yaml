@@ -1,0 +1,6 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/nginx
+tag: nginx
+version: 1.27-alpine3.21
+dockerfile: |
+  FROM nginx:1.27-alpine3.21 
