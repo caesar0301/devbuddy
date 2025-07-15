@@ -75,13 +75,10 @@ jobs:
             exit 1
           fi
           
-          # Convert platforms to array format for YAML
-          PLATFORMS_ARRAY=$(echo "$PLATFORMS" | tr ',' '\n' | sed 's/^/  - /' | tr '\n' ' ' | sed 's/ $//')
-          
           # Set outputs
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "base_image=${{ github.event.inputs.base_image }}" >> $GITHUB_OUTPUT
-          echo "platforms=$PLATFORMS_ARRAY" >> $GITHUB_OUTPUT
+          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
           echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
           echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           echo "dockerfile_content=${{ github.event.inputs.dockerfile_content }}" >> $GITHUB_OUTPUT
@@ -117,14 +114,22 @@ jobs:
           mkdir -p "images/$IMAGE_NAME"
           
           # Create config.yaml
-          cat > "images/$IMAGE_NAME/config.yaml" << EOF
-          platforms: [$PLATFORMS]
-          context: images/$IMAGE_NAME
-          tag: $TAG
-          version: $VERSION
-          dockerfile: |
-            $([ -n "$DOCKERFILE_CONTENT" ] && echo "$DOCKERFILE_CONTENT" || echo "FROM $BASE_IMAGE")
-          EOF
+          # Prepare dockerfile content
+          if [ -n "$DOCKERFILE_CONTENT" ]; then
+            DOCKERFILE_LINES="$DOCKERFILE_CONTENT"
+          else
+            DOCKERFILE_LINES="FROM $BASE_IMAGE"
+          fi
+          
+          # Create the config file
+          {
+            echo "platforms: [$PLATFORMS]"
+            echo "context: images/$IMAGE_NAME"
+            echo "tag: $TAG"
+            echo "version: $VERSION"
+            echo "dockerfile: |"
+            echo "$DOCKERFILE_LINES" | sed 's/^/  /'
+          } > "images/$IMAGE_NAME/config.yaml"
           
           # Create README.md
           cat > "images/$IMAGE_NAME/README.md" << EOF
