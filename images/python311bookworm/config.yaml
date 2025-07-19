@@ -1,0 +1,6 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/python311bookworm
+tag: python
+version: 3.11-bookworm
+dockerfile: |
+  FROM python:3.11-bookworm
