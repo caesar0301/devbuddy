@@ -1,6 +1,6 @@
 platforms: [linux/amd64, linux/arm64]
-context: images/python311bullseye
+context: images/python311
 tag: python
-version: 3.11-bullseye
+version: 3.11-alpine3.21
 dockerfile: |
-  FROM python:3.11-bullseye
+  FROM python:3.11-alpine3.21 
