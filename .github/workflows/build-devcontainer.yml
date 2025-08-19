@@ -25,9 +25,9 @@ jobs:
         with:
           filters: |
             devcbase:
-              - 'devcontainer/base/Dockerfile'
+              - 'devcontainer/base/*'
             devc:
-              - 'devcontainer/pydev/Dockerfile'
+              - 'devcontainer/pydev/*'
 
   build-and-push:
     needs: filter-changes
