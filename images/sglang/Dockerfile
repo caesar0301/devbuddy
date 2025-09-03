@@ -33,12 +33,24 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 # Create a Conda environment for sglang
 RUN conda create -n sglang_env python=3.10 -y
 SHELL ["conda", "run", "-n", "sglang_env", "/bin/bash", "-c"]
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=$CUDA_HOME/bin:$PATH
 
-# Install PyTorch first with a specific CUDA version
-# This command assumes a CUDA 12.1 compatible GPU
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# Add NVIDIA package repositories
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin && \
+    mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && \
+    dpkg -i cuda-keyring_1.1-1_all.deb
 
-# Now, install the rest of the libraries, including flash-attn
+# Install CUDA Toolkit and other build essentials
+RUN apt-get update && apt-get install -y \
+    cuda-toolkit-12-1 \
+    rm -rf /var/lib/apt/lists/*
+
+# Install PyTorch first, specifying the correct CUDA version
+RUN pip install torch==2.5.1+cu121 torchvision==0.16.1+cu121 torchaudio==2.5.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+
+# Now, install the remaining libraries that require CUDA
 RUN pip install \
     sglang \
     "transformers>=4.40.1" \
