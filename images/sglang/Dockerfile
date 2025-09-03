@@ -55,15 +55,4 @@ ENV PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 PIP_INDEX_URL=https:/
 RUN pip install torch==2.5.1+cu124 torchvision==0.20.1+cu124 torchaudio==2.5.1+cu124 --index-url https://download.pytorch.org/whl/cu124
 
 # Now, install the remaining libraries
-RUN pip install -U \
-    sglang \
-    "transformers>=4.40.1" \
-    "diffusers>=0.28.0" \
-    "peft>=0.10.0" \
-    "accelerate>=0.29.0" \
-    "bitsandbytes>=0.43.1" \
-    "flash-attn>=2.5.8" \
-    "ninja" \
-    "sentencepiece" \
-    "protobuf" \
-    "Pillow"
+RUN pip install -U sglang transformers diffusers peft
