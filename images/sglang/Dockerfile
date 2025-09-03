@@ -1,13 +1,6 @@
 # Use the official Ubuntu 22.04 image as the base
 FROM registry.cn-hangzhou.aliyuncs.com/lacogito/ubuntu:22.04
 
-# Use Aliyun mirror for amd64 Ubuntu 22.04 (jammy)
-RUN echo "deb http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse\n\
-deb http://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse\n\
-deb http://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse\n\
-deb http://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse" \
-> /etc/apt/sources.list
-
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive
 
