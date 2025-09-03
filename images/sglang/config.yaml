@@ -1,5 +1,5 @@
-platforms: [linux/amd64, linux/arm64]
+platforms: [linux/amd64]
 context: images/sglang
 tag: sglang
-version: latest
+version: pytorch251-cu124-gpu-py310-ubuntu2204
 dockerfile: images/sglang/Dockerfile
