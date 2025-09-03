@@ -26,6 +26,10 @@ RUN wget --no-check-certificate https://repo.anaconda.com/miniconda/Miniconda3-l
 ENV PATH="/opt/conda/bin:${PATH}"
 RUN conda init bash
 
+# Accept Conda's Terms of Service for non-interactive use
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+    
 # Create a Conda environment for sglang
 RUN conda create -n sglang_env python=3.10 -y
 SHELL ["conda", "run", "-n", "sglang_env", "/bin/bash", "-c"]
