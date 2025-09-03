@@ -2,3 +2,4 @@ platforms: [linux/amd64, linux/arm64]
 context: images/sglang
 tag: sglang
 version: latest
+dockerfile: images/sglang/Dockerfile
