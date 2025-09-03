@@ -34,10 +34,13 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
 RUN conda create -n sglang_env python=3.10 -y
 SHELL ["conda", "run", "-n", "sglang_env", "/bin/bash", "-c"]
 
-# Install necessary Python libraries
+# Install PyTorch first with a specific CUDA version
+# This command assumes a CUDA 12.1 compatible GPU
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# Now, install the rest of the libraries, including flash-attn
 RUN pip install \
     sglang \
-    "torch>=2.0.0" \
     "transformers>=4.40.1" \
     "diffusers>=0.28.0" \
     "peft>=0.10.0" \
