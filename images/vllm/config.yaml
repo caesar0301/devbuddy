@@ -1,0 +1,6 @@
+platforms: [linux/amd64]
+context: images/vllm
+tag: vllm-openai
+version: v0.10.1.1
+dockerfile: |
+  FROM vllm/vllm-openai:v0.10.1.1
