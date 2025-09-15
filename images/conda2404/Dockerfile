@@ -1,12 +1,5 @@
 # Use the official Ubuntu 24.04 image as the base
-FROM ubuntu:24.04
-
-# Configure Aliyun mirrors for Ubuntu 24.04 (noble)
-RUN echo "deb http://mirrors.aliyun.com/ubuntu/ noble main restricted universe multiverse\n\
-deb http://mirrors.aliyun.com/ubuntu/ noble-updates main restricted universe multiverse\n\
-deb http://mirrors.aliyun.com/ubuntu/ noble-backports main restricted universe multiverse\n\
-deb http://mirrors.aliyun.com/ubuntu/ noble-security main restricted universe multiverse" \
-> /etc/apt/sources.list
+FROM registry.cn-hangzhou.aliyuncs.com/lacogito/ubuntu:24.04
 
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive
