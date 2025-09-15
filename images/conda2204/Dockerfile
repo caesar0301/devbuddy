@@ -11,6 +11,11 @@ deb http://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe mu
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Update and install system dependencies
+RUN apt-get update && apt-get install -y \
+    wget && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install Miniconda adaptively for x86_64 or aarch64
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "x86_64" ]; then \
