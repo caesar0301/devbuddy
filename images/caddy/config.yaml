@@ -1,0 +1,6 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/caddy
+tag: caddy
+version: 2-alpine
+dockerfile: |
+  FROM caddy:2-alpine
