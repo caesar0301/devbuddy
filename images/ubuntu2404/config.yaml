@@ -1,5 +1,5 @@
 platforms: [linux/amd64, linux/arm64]
-context: images/ubuntu
+context: images/ubuntu2404
 tag: ubuntu
 version: 24.04
 dockerfile: |
