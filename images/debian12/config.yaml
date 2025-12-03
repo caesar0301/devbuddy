@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/debian12
+tag: debian
+version: 12.12
+dockerfile: |
+  FROM debian:12.12
+
