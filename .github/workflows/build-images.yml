@@ -1,4 +1,4 @@
-name: Build DevBuddy Images
+name: Build Images
 
 on:
   push:
