@@ -11,17 +11,20 @@ RUN apt-get update && apt-get install -y \
     wget && \
     rm -rf /var/lib/apt/lists/*
 
-# Detect architecture and download appropriate Miniconda installer
-RUN case $(uname -m) in \
-        aarch64|arm64) export ARCH="aarch64" ;; \
-        x86_64) export ARCH="x86_64" ;; \
-        *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;; \
-    esac && \
-    wget --quiet --no-check-certificate "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-\${ARCH}.sh" -O miniconda.sh && \
-    /bin/bash miniconda.sh -b -p $CONDA_DIR && \
-    rm miniconda.sh && \
-    $CONDA_DIR/bin/conda init && \
-    $CONDA_DIR/bin/conda config --set auto_activate_base false
+# Install Miniconda adaptively for x86_64 or aarch64
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh"; \
+    else \
+        echo "Unsupported architecture: $ARCH"; exit 1; \
+    fi && \
+    wget --no-check-certificate --quiet "$MINICONDA_URL" -O /tmp/miniconda.sh && \
+    /bin/bash /tmp/miniconda.sh -b -p ${CONDA_DIR} && \
+    rm /tmp/miniconda.sh && \
+    ${CONDA_DIR}/bin/conda init && \
+    ${CONDA_DIR}/bin/conda config --set auto_activate_base false
 
 # Configure Conda to use conda-forge as the only channel
 RUN conda config --remove channels defaults || true && \
