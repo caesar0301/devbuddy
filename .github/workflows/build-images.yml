@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'images/**'
-      - '.github/workflows/build-devbuddy.yml'
+      - '.github/workflows/build-images.yml'
 
 permissions:
   contents: read
