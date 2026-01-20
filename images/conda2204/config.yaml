@@ -2,4 +2,3 @@ platforms: [linux/amd64, linux/arm64]
 context: images/conda2204
 tag: conda-forge
 version: ubuntu2204
-dockerfile: images/conda2204/Dockerfile

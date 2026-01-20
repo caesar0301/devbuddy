@@ -2,4 +2,3 @@ platforms: [linux/amd64]
 context: images/sglang
 tag: sglang
 version: pytorch251-cu124-py310-ubuntu2204
-dockerfile: images/sglang/Dockerfile
