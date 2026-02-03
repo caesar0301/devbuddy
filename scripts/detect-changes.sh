@@ -251,9 +251,11 @@ main() {
         echo "${changed_images[*]}" > changed_images.txt
     fi
     
-    # Output summary for CI
-    echo "changed_count=${#changed_images[@]}" >> $GITHUB_OUTPUT
-    echo "changed_images=${changed_images[*]}" >> $GITHUB_OUTPUT
+    # Output summary for CI (if running in CI)
+    if [ -n "$GITHUB_OUTPUT" ]; then
+        echo "changed_count=${#changed_images[@]}" >> "$GITHUB_OUTPUT"
+        echo "changed_images=${changed_images[*]}" >> "$GITHUB_OUTPUT"
+    fi
     
     print_status $BLUE "Results saved to:"
     echo "  - changed_images.json (JSON array)"
