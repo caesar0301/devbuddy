@@ -57,21 +57,26 @@ if [[ -z "$DOCKERFILE_SPEC" || "$DOCKERFILE_SPEC" == "null" ]]; then
   # No dockerfile specified: use default Dockerfile in the context directory.
   DOCKERFILE_PATH="$CONTEXT/Dockerfile"
   echo "Using default Dockerfile at $DOCKERFILE_PATH"
-elif [[ "$DOCKERFILE_SPEC" != *$'\n'* ]]; then
-  # Single-line value: interpret as a Dockerfile path relative to context.
-  if [[ "$DOCKERFILE_SPEC" = /* ]]; then
-    # Absolute path (rare, but allow it explicitly).
-    DOCKERFILE_PATH="$DOCKERFILE_SPEC"
-  else
-    DOCKERFILE_PATH="$CONTEXT/$DOCKERFILE_SPEC"
-  fi
-  echo "Using Dockerfile at $DOCKERFILE_PATH"
 else
-  # Multi-line value: treat as Dockerfile content.
-  DOCKERFILE_PATH="$CONTEXT/Dockerfile"
-  mkdir -p "$(dirname "$DOCKERFILE_PATH")"
-  printf '%s\n' "$DOCKERFILE_SPEC" > "$DOCKERFILE_PATH"
-  echo "Created Dockerfile at $DOCKERFILE_PATH from inline dockerfile content"
+  # Check if it's a multi-line string or contains newlines
+  # Also check if it starts with "FROM" (common Dockerfile indicator) or contains spaces (likely content, not path)
+  LINE_COUNT=$(echo "$DOCKERFILE_SPEC" | wc -l | tr -d ' ')
+  if [[ "$LINE_COUNT" -gt 1 ]] || [[ "$DOCKERFILE_SPEC" =~ ^FROM[[:space:]] ]] || [[ "$DOCKERFILE_SPEC" =~ [[:space:]] ]]; then
+    # Multi-line value or Dockerfile content: treat as inline Dockerfile content.
+    DOCKERFILE_PATH="$CONTEXT/Dockerfile"
+    mkdir -p "$(dirname "$DOCKERFILE_PATH")"
+    printf '%s\n' "$DOCKERFILE_SPEC" > "$DOCKERFILE_PATH"
+    echo "Created Dockerfile at $DOCKERFILE_PATH from inline dockerfile content"
+  else
+    # Single-line value: interpret as a Dockerfile path relative to context.
+    if [[ "$DOCKERFILE_SPEC" = /* ]]; then
+      # Absolute path (rare, but allow it explicitly).
+      DOCKERFILE_PATH="$DOCKERFILE_SPEC"
+    else
+      DOCKERFILE_PATH="$CONTEXT/$DOCKERFILE_SPEC"
+    fi
+    echo "Using Dockerfile at $DOCKERFILE_PATH"
+  fi
 fi
 
 # Output for GitHub Actions (if running in CI)

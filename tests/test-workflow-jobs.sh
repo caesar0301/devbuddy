@@ -211,11 +211,12 @@ test_build_and_push_job() {
     fi
     
     print_test "Step: Prepare Dockerfile and config"
-    # Test with a few different images/versions
+    # Test with a few different images/versions including single-line inline Dockerfile
     TEST_CASES=(
         "alpine 3.21"
         "python 3.11-alpine3.21"
         "ubuntu 22.04"
+        "savant-deepstream latest"
     )
     
     for test_case in "${TEST_CASES[@]}"; do

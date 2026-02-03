@@ -57,4 +57,45 @@ else
   exit 1
 fi
 
+# Test 5: Should handle single-line inline Dockerfile (like savant-deepstream)
+echo "Test 5: Single-line inline Dockerfile"
+if bash "$PREPARE_SCRIPT" savant-deepstream "latest" > /dev/null 2>&1; then
+  source "$PREPARE_SCRIPT" savant-deepstream "latest" > /dev/null 2>&1
+  if [ -f "$PROJECT_ROOT/images/savant-deepstream/Dockerfile" ]; then
+    DOCKERFILE_CONTENT=$(cat "$PROJECT_ROOT/images/savant-deepstream/Dockerfile")
+    if echo "$DOCKERFILE_CONTENT" | grep -q "FROM ghcr.io/insight-platform/savant-deepstream:latest"; then
+      if [ "$dockerfile_path" = "images/savant-deepstream/Dockerfile" ]; then
+        echo "  ✓ PASS: Correctly creates Dockerfile from single-line inline content"
+      else
+        echo "  ✗ FAIL: Wrong dockerfile_path: $dockerfile_path"
+        exit 1
+      fi
+    else
+      echo "  ✗ FAIL: Dockerfile content incorrect"
+      exit 1
+    fi
+  else
+    echo "  ✗ FAIL: Dockerfile not created"
+    exit 1
+  fi
+else
+  echo "  ✗ FAIL: Should succeed with single-line inline Dockerfile"
+  exit 1
+fi
+
+# Test 6: Should handle file path Dockerfile (like sglang)
+echo "Test 6: File path Dockerfile"
+if bash "$PREPARE_SCRIPT" sglang "pytorch251-cu124-py310-ubuntu2204" > /dev/null 2>&1; then
+  source "$PREPARE_SCRIPT" sglang "pytorch251-cu124-py310-ubuntu2204" > /dev/null 2>&1
+  if [ "$dockerfile_path" = "images/sglang/Dockerfile" ]; then
+    echo "  ✓ PASS: Correctly uses file path Dockerfile"
+  else
+    echo "  ✗ FAIL: Wrong dockerfile_path: $dockerfile_path (expected images/sglang/Dockerfile)"
+    exit 1
+  fi
+else
+  echo "  ✗ FAIL: Should succeed with file path Dockerfile"
+  exit 1
+fi
+
 echo "All tests passed for prepare-dockerfile.sh"
