@@ -70,10 +70,17 @@ jobs:
         id: detect-changes
         run: |
           # Handle manual workflow dispatch with force_build_all
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.force_build_all }}" == "true" ]; then
+          # Note: GitHub Actions boolean inputs come through as strings "true"/"false"
+          FORCE_BUILD="${{ github.event.inputs.force_build_all }}"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "$FORCE_BUILD" == "true" ]; then
             echo "Force building all images..."
-            # Get all image directories
-            find images -name "config.yaml" -type f | sed 's|images/||;s|/config.yaml||' | jq -R -s -c 'split("\n")[:-1]' > changed_images.json
+            # Get all image directories and create JSON array
+            find images -name "config.yaml" -type f | \
+              sed 's|images/||;s|/config.yaml||' | \
+              grep -v '^$' | \
+              jq -R . | \
+              jq -s . > changed_images.json
+            echo "Found $(cat changed_images.json | jq 'length') images to build"
           else
             # Handle empty github.event.before (first push or no previous commit)
             BEFORE_COMMIT="${{ github.event.before }}"
