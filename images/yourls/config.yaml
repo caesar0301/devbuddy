@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/yourls
 tag: yourls
-version: 1.10.2
-dockerfile: |
-  FROM yourls:1.10.2
+versions:
+  "1.10.2":
+    dockerfile: |
+      FROM yourls:1.10.2

@@ -1,6 +1,0 @@
-platforms: [linux/amd64, linux/arm64]
-context: images/ubuntu2404
-tag: ubuntu
-version: 24.04
-dockerfile: |
-  FROM ubuntu:24.04 

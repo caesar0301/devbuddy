@@ -57,7 +57,7 @@ validate_image_config() {
     fi
     
     # Check required fields using yq or python
-    local required_fields=("platforms" "context" "tag" "version" "dockerfile")
+    local required_fields=("platforms" "context" "tag")
     for field in "${required_fields[@]}"; do
         if command -v yq >/dev/null 2>&1; then
             if ! yq e ".$field" "$config_file" >/dev/null 2>&1; then
@@ -78,6 +78,27 @@ with open('$config_file') as f:
             fi
         fi
     done
+    
+    # Multi-version format is required
+    if command -v yq >/dev/null 2>&1; then
+        HAS_VERSIONS=$(yq e '.versions // null' "$config_file")
+        if [ "$HAS_VERSIONS" == "null" ] || [ -z "$HAS_VERSIONS" ]; then
+            print_status $RED "Error: Config must use multi-version format with 'versions' field in $config_file"
+            return 1
+        fi
+    else
+        # Fallback to python
+        if ! python3 -c "
+import yaml
+with open('$config_file') as f:
+    config = yaml.safe_load(f)
+    if 'versions' not in config or not config.get('versions'):
+        exit(1)
+" >/dev/null 2>&1; then
+            print_status $RED "Error: Config must use multi-version format with 'versions' field in $config_file"
+            return 1
+        fi
+    fi
     
     return 0
 }

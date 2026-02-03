@@ -1,6 +1,0 @@
-platforms: [linux/amd64, linux/arm64]
-context: images/ubuntu2204
-tag: ubuntu
-version: 22.04
-dockerfile: |
-  FROM ubuntu:22.04

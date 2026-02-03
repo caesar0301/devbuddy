@@ -1,14 +1,16 @@
 #!/bin/bash
-# Usage: scripts/prepare-dockerfile.sh <image_name>
+# Usage: scripts/prepare-dockerfile.sh <image_name> [version]
 # Outputs: context, platforms, tag, version, dockerfile_path as environment variables
+# Requires multi-version config format with 'versions' field
 set -e
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <image_name>" >&2
+  echo "Usage: $0 <image_name> [version]" >&2
   exit 1
 fi
 
 IMAGE_NAME="$1"
+VERSION_OVERRIDE="$2"
 CONFIG_FILE="images/$IMAGE_NAME/config.yaml"
 
 if [ ! -f "$CONFIG_FILE" ]; then
@@ -19,8 +21,31 @@ fi
 CONTEXT=$(yq e '.context' "$CONFIG_FILE")
 PLATFORMS=$(yq e -o=json '.platforms' "$CONFIG_FILE" | jq -r 'join(",")')
 TAG=$(yq e '.tag' "$CONFIG_FILE")
-VERSION=$(yq e '.version' "$CONFIG_FILE")
-DOCKERFILE_SPEC=$(yq e '.dockerfile // ""' "$CONFIG_FILE")
+
+# Multi-version format is required
+HAS_VERSIONS=$(yq e '.versions // null' "$CONFIG_FILE")
+if [ "$HAS_VERSIONS" == "null" ] || [ -z "$HAS_VERSIONS" ]; then
+  echo "Error: Config must use multi-version format with 'versions' field" >&2
+  exit 1
+fi
+
+if [ -z "$VERSION_OVERRIDE" ]; then
+  echo "Error: Version must be specified. Available versions:" >&2
+  yq e '.versions | keys | .[]' "$CONFIG_FILE" >&2
+  exit 1
+fi
+
+# Check if version exists
+VERSION_EXISTS=$(yq e ".versions.\"$VERSION_OVERRIDE\" // null" "$CONFIG_FILE")
+if [ "$VERSION_EXISTS" == "null" ]; then
+  echo "Error: Version '$VERSION_OVERRIDE' not found in config. Available versions:" >&2
+  yq e '.versions | keys | .[]' "$CONFIG_FILE" >&2
+  exit 1
+fi
+
+VERSION="$VERSION_OVERRIDE"
+# Get version-specific dockerfile, or fall back to root dockerfile, or default
+DOCKERFILE_SPEC=$(yq e ".versions.\"$VERSION\".dockerfile // .dockerfile // \"\"" "$CONFIG_FILE")
 
 # Prepare Dockerfile
 # Rules:
@@ -49,14 +74,16 @@ else
   echo "Created Dockerfile at $DOCKERFILE_PATH from inline dockerfile content"
 fi
 
-# Output for GitHub Actions
-{
-  echo "context=$CONTEXT"
-  echo "platforms=$PLATFORMS"
-  echo "tag=$TAG"
-  echo "version=$VERSION"
-  echo "dockerfile_path=$DOCKERFILE_PATH"
-} >> "$GITHUB_OUTPUT"
+# Output for GitHub Actions (if running in CI)
+if [ -n "$GITHUB_OUTPUT" ]; then
+  {
+    echo "context=$CONTEXT"
+    echo "platforms=$PLATFORMS"
+    echo "tag=$TAG"
+    echo "version=$VERSION"
+    echo "dockerfile_path=$DOCKERFILE_PATH"
+  } >> "$GITHUB_OUTPUT"
+fi
 
 # Also export for local use
 export context="$CONTEXT"

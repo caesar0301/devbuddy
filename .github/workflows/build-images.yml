@@ -66,14 +66,7 @@ jobs:
           echo "::group::Changed Images"
           cat changed_images.json
           echo "::endgroup::"
-          # Convert JSON array to GitHub Actions matrix format
-          MATRIX=$(cat changed_images.json | jq -c '[.[] | {"name": .}]')
-          HAS_CHANGES=false
-          if [ "$(cat changed_images.json)" != "[]" ]; then
-            HAS_CHANGES=true
-          fi
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-          echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
+          bash scripts/expand-matrix.sh changed_images.json
 
       - name: Show matrix
         run: |
@@ -117,16 +110,16 @@ jobs:
       - name: Prepare Dockerfile and config
         id: prepare
         run: |
-          bash scripts/prepare-dockerfile.sh ${{ matrix.component.name }}
+          bash scripts/prepare-dockerfile.sh ${{ matrix.component.name }} ${{ matrix.component.version }}
 
-      - name: Build and push ${{ matrix.component.name }} image
+      - name: Build and push ${{ matrix.component.name }}:${{ matrix.component.version }} image
         uses: docker/build-push-action@v5
         with:
           context: ${{ steps.prepare.outputs.context }}
           file: ${{ steps.prepare.outputs.dockerfile_path }}
           push: true
           platforms: ${{ steps.prepare.outputs.platforms }}
-          cache-from: type=gha,scope=${{ matrix.component.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}
+          cache-from: type=gha,scope=${{ matrix.component.name }}-${{ matrix.component.version }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}-${{ matrix.component.version }}
           tags: |
             registry.cn-hangzhou.aliyuncs.com/lacogito/${{ steps.prepare.outputs.tag }}:${{ steps.prepare.outputs.version }}

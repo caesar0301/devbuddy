@@ -1,0 +1,8 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/conda
+tag: conda-forge
+versions:
+  ubuntu2204:
+    dockerfile: Dockerfile.ubuntu2204
+  ubuntu2404:
+    dockerfile: Dockerfile.ubuntu2404

@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/alpine
 tag: alpine
-version: 3.21
-dockerfile: |
-  FROM alpine:3.21 
+versions:
+  "3.21":
+    dockerfile: |
+      FROM alpine:3.21

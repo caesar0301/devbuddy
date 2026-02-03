@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/neo4j
 tag: neo4j
-version: 5.26.5-community-ubi9
-dockerfile: |
-  FROM neo4j:5.26.5-community-ubi9 
+versions:
+  "5.26.5-community-ubi9":
+    dockerfile: |
+      FROM neo4j:5.26.5-community-ubi9

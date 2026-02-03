@@ -1,6 +1,0 @@
-platforms: [linux/amd64, linux/arm64]
-context: images/python311bullseye
-tag: python
-version: 3.11-bullseye
-dockerfile: |
-  FROM python:3.11-bullseye

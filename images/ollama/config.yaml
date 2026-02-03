@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/ollama
 tag: ollama
-version: 0.9.1
-dockerfile: |
-  FROM ollama/ollama:0.9.1 
+versions:
+  "0.9.1":
+    dockerfile: |
+      FROM ollama/ollama:0.9.1

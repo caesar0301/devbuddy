@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/pgvector
 tag: pgvector
-version: pg17
-dockerfile: |
-  FROM pgvector/pgvector:pg17 
+versions:
+  "pg17":
+    dockerfile: |
+      FROM pgvector/pgvector:pg17

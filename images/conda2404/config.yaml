@@ -1,4 +1,0 @@
-platforms: [linux/amd64, linux/arm64]
-context: images/conda2404
-tag: conda-forge
-version: ubuntu2404

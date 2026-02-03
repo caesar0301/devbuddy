@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/miniomc
 tag: minio-mc
-version: latest
-dockerfile: |
-  FROM minio/mc:latest 
+versions:
+  "latest":
+    dockerfile: |
+      FROM minio/mc:latest

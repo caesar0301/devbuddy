@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/searxng
 tag: searxng
-version: 20250914
-dockerfile: |
-  FROM searxng/searxng:2025.9.14-23257bd
+versions:
+  "20250914":
+    dockerfile: |
+      FROM searxng/searxng:2025.9.14-23257bd

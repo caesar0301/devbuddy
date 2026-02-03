@@ -1,6 +1,7 @@
 platforms: [linux/amd64, linux/arm64]
 context: images/valkey
 tag: valkey
-version: 8.1-alpine3.21
-dockerfile: |
-  FROM valkey/valkey:8.1-alpine3.21
+versions:
+  "8.1-alpine3.21":
+    dockerfile: |
+      FROM valkey/valkey:8.1-alpine3.21
