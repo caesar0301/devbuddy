@@ -150,6 +150,13 @@ main() {
         exit 1
     fi
     
+    # Handle empty or null base commit (first push scenario)
+    if [ -z "$BASE_COMMIT" ] || [ "$BASE_COMMIT" == "0000000000000000000000000000000000000000" ]; then
+        # Try to use HEAD~1, or if that doesn't exist, use HEAD (treat all files as new)
+        BASE_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "$TARGET_COMMIT")
+        print_status $YELLOW "Note: No previous commit found, using $BASE_COMMIT as base"
+    fi
+    
     # Validate commits exist
     if ! git rev-parse --verify "$BASE_COMMIT" >/dev/null 2>&1; then
         print_status $RED "Error: Base commit '$BASE_COMMIT' does not exist"

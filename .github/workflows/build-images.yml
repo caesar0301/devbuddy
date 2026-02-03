@@ -7,6 +7,13 @@ on:
     paths:
       - 'images/**'
       - '.github/workflows/build-images.yml'
+  workflow_dispatch:
+    inputs:
+      force_build_all:
+        description: 'Force build all images (ignores change detection)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -62,7 +69,13 @@ jobs:
       - name: Detect changed images
         id: detect-changes
         run: |
-          bash scripts/detect-changes.sh ${{ github.event.before }} ${{ github.sha }}
+          # Handle empty github.event.before (first push or no previous commit)
+          BEFORE_COMMIT="${{ github.event.before }}"
+          if [ -z "$BEFORE_COMMIT" ] || [ "$BEFORE_COMMIT" == "0000000000000000000000000000000000000000" ]; then
+            # Use HEAD~1 as fallback, or if that doesn't exist, use HEAD (all files are new)
+            BEFORE_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "${{ github.sha }}")
+          fi
+          bash scripts/detect-changes.sh "$BEFORE_COMMIT" "${{ github.sha }}"
           echo "::group::Changed Images"
           cat changed_images.json
           echo "::endgroup::"
