@@ -69,13 +69,20 @@ jobs:
       - name: Detect changed images
         id: detect-changes
         run: |
-          # Handle empty github.event.before (first push or no previous commit)
-          BEFORE_COMMIT="${{ github.event.before }}"
-          if [ -z "$BEFORE_COMMIT" ] || [ "$BEFORE_COMMIT" == "0000000000000000000000000000000000000000" ]; then
-            # Use HEAD~1 as fallback, or if that doesn't exist, use HEAD (all files are new)
-            BEFORE_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "${{ github.sha }}")
+          # Handle manual workflow dispatch with force_build_all
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.force_build_all }}" == "true" ]; then
+            echo "Force building all images..."
+            # Get all image directories
+            find images -name "config.yaml" -type f | sed 's|images/||;s|/config.yaml||' | jq -R -s -c 'split("\n")[:-1]' > changed_images.json
+          else
+            # Handle empty github.event.before (first push or no previous commit)
+            BEFORE_COMMIT="${{ github.event.before }}"
+            if [ -z "$BEFORE_COMMIT" ] || [ "$BEFORE_COMMIT" == "0000000000000000000000000000000000000000" ]; then
+              # Use HEAD~1 as fallback, or if that doesn't exist, use HEAD (all files are new)
+              BEFORE_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "${{ github.sha }}")
+            fi
+            bash scripts/detect-changes.sh "$BEFORE_COMMIT" "${{ github.sha }}"
           fi
-          bash scripts/detect-changes.sh "$BEFORE_COMMIT" "${{ github.sha }}"
           echo "::group::Changed Images"
           cat changed_images.json
           echo "::endgroup::"
