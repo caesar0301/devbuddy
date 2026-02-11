@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/go2rtc
+tag: go2rtc
+versions:
+  "latest":
+    dockerfile: |
+      FROM alexxit/go2rtc:latest
