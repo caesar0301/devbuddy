@@ -1,0 +1,13 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/rust
+tag: rust
+versions:
+  "1.93-alpine3.21":
+    dockerfile: |
+      FROM rust:1.93-alpine3.21
+  "1.93-bookworm":
+    dockerfile: |
+      FROM rust:1.93-bookworm
+  "1.93-bullseye":
+    dockerfile: |
+      FROM rust:1.93-bullseye
