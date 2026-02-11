@@ -8,3 +8,9 @@ versions:
   "13.2":
     dockerfile: |
       FROM debian:13.2
+  "bookworm-slim":
+    dockerfile: |
+      FROM debian:bookworm-slim
+  "bullseye-slim":
+    dockerfile: |
+      FROM debian:bullseye-slim
