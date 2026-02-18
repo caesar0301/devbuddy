@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/coturn
+tag: coturn
+versions:
+  "4.8.0":
+    dockerfile: |
+      FROM coturn/coturn:4.8.0
