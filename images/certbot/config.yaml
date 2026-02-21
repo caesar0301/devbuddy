@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/certbot
+tag: certbot
+versions:
+  latest:
+    dockerfile: |
+      FROM certbot/certbot:latest
