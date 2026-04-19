@@ -17,6 +17,9 @@ versions:
   3.11-bookworm:
     dockerfile: |
       FROM python:3.11-bookworm
+  3.12-bookworm:
+    dockerfile: |
+      FROM python:3.12-bookworm
   3.10-bullseye:
     dockerfile: |
       FROM python:3.10-bullseye
