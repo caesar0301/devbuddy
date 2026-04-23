@@ -2,12 +2,15 @@ platforms: [linux/amd64, linux/arm64]
 context: images/golang
 tag: golang
 versions:
-  "1.25-alpine3.19":
+  "1.25-alpine3.22":
     dockerfile: |
-      FROM golang:1.25-alpine3.19
-  "1.25-alpine3.20":
+      FROM golang:1.25-alpine3.22
+  "1.25-alpine3.23":
     dockerfile: |
-      FROM golang:1.25-alpine3.20
-  "1.25-alpine3.21":
+      FROM golang:1.25-alpine3.23
+  "1.26-alpine3.22":
     dockerfile: |
-      FROM golang:1.25-alpine3.21
+      FROM golang:1.26-alpine3.22
+  "1.26-alpine3.23":
+    dockerfile: |
+      FROM golang:1.26-alpine3.23
