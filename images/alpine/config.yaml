@@ -5,3 +5,9 @@ versions:
   "3.21":
     dockerfile: |
       FROM alpine:3.21
+  "3.22":
+    dockerfile: |
+      FROM alpine:3.22
+  "3.23":
+    dockerfile: |
+      FROM alpine:3.23
