@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/clickhouse
+tag: clickhouse
+versions:
+  "24.8":
+    dockerfile: |
+      FROM docker.io/clickhouse/clickhouse-server:24.8

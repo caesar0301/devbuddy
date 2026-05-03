@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/langfuse-worker
+tag: langfuse-worker
+versions:
+  "3":
+    dockerfile: |
+      FROM ghcr.io/langfuse/langfuse-worker:3
