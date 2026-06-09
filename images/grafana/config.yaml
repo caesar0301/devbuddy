@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/grafana
+tag: grafana
+versions:
+  "11.1.0":
+    dockerfile: |
+      FROM grafana/grafana:11.1.0

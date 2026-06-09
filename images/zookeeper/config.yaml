@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/zookeeper
+tag: cp-zookeeper
+versions:
+  "7.4.0":
+    dockerfile: |
+      FROM confluentinc/cp-zookeeper:7.4.0

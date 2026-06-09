@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/kafka
+tag: cp-kafka
+versions:
+  "7.4.0":
+    dockerfile: |
+      FROM confluentinc/cp-kafka:7.4.0

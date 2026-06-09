@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/opentelemetry-collector
+tag: opentelemetry-collector-contrib
+versions:
+  "0.103.1":
+    dockerfile: |
+      FROM otel/opentelemetry-collector-contrib:0.103.1
