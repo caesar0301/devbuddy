@@ -11,3 +11,9 @@ versions:
   "1.93-bullseye":
     dockerfile: |
       FROM rust:1.93-bullseye
+  "1.97-bookworm":
+    dockerfile: |
+      FROM rust:1.97-bookworm
+  "1.97-alpine3.23":
+    dockerfile: |
+      FROM rust:1.97-alpine3.23
