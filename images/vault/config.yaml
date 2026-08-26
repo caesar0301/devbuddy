@@ -1,0 +1,7 @@
+platforms: [linux/amd64, linux/arm64]
+context: images/vault
+tag: vault
+versions:
+  "1.15":
+    dockerfile: |
+      FROM hashicorp/vault:1.15
