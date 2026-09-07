@@ -145,6 +145,7 @@ jobs:
           context: ${{ steps.prepare.outputs.context }}
           file: ${{ steps.prepare.outputs.dockerfile_path }}
           push: true
+          provenance: false
           platforms: ${{ steps.prepare.outputs.platforms }}
           cache-from: type=gha,scope=${{ matrix.component.name }}-${{ matrix.component.version }}
           cache-to: type=gha,mode=max,scope=${{ matrix.component.name }}-${{ matrix.component.version }}
