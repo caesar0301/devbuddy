@@ -5,3 +5,6 @@ versions:
   "1.15":
     dockerfile: |
       FROM hashicorp/vault:1.15
+  "2.1":
+    dockerfile: |
+      FROM hashicorp/vault:2.1
